@@ -17,7 +17,7 @@ namespace MetroDemo.ExampleWindows
             selector.FirstTemplate = this.Resources["Temp1"] as DataTemplate;
             selector.SecondTemplate = this.Resources["Temp2"] as DataTemplate;
             selector.NullTemplate = this.Resources["Temp0"] as DataTemplate;
-            this.tc.ContentTemplateSelector = selector;
+            //this.tc.ContentTemplateSelector = selector;
         }
 
         internal class SuperDataTemplateSelector : System.Windows.Controls.DataTemplateSelector
@@ -48,7 +48,10 @@ namespace MetroDemo.ExampleWindows
 
         private void Button_Click_1(object sender, System.Windows.RoutedEventArgs e)
         {
-            this.ShowMessageAsync("Something", "Something should be displayed here.");
+            this.ShowMessageAsync("Something", "Something should be displayed here.", MessageDialogStyle.Affirmative, new MetroDialogSettings()
+            {
+                ColorScheme = MetroDialogColorScheme.Inverted
+            });
         }
     }
 }

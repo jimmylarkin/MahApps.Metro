@@ -12,13 +12,15 @@
     <Style TargetType="{x:Type Controls:NumericUpDown}">
         <Setter Property="BorderThickness"
                 Value="1" />
+        <Setter Property="SnapsToDevicePixels"
+                Value="true" />
         <Setter Property="Foreground"
                 Value="{DynamicResource TextBrush}" />
         <Setter Property="BorderBrush"
                 Value="{DynamicResource TextBoxBorderBrush}" />
-        <Setter Property="Controls:TextboxHelper.FocusBorderBrush"
+        <Setter Property="Controls:ControlsHelper.FocusBorderBrush"
                 Value="{DynamicResource TextBoxFocusBorderBrush}" />
-        <Setter Property="Controls:TextboxHelper.MouseOverBorderBrush"
+        <Setter Property="Controls:ControlsHelper.MouseOverBorderBrush"
                 Value="{DynamicResource TextBoxMouseOverBorderBrush}" />
         <Setter Property="VerticalAlignment"
                 Value="Center" />
@@ -26,8 +28,12 @@
                 Value="{DynamicResource ContentFontFamily}" />
         <Setter Property="FontSize"
                 Value="{DynamicResource ContentFontSize}" />
-        <Setter Property="Controls:TextboxHelper.IsMonitoring"
+        <Setter Property="Controls:TextBoxHelper.IsMonitoring"
                 Value="True" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility"
+                Value="Auto" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility"
+                Value="Auto" />
         <Setter Property="MinHeight"
                 Value="26" />
         <Setter Property="MinWidth"
@@ -36,53 +42,60 @@
                 Value="{DynamicResource ControlBackgroundBrush}" />
         <Setter Property="Validation.ErrorTemplate"
                 Value="{DynamicResource ValidationErrorTemplate}" />
+        <Setter Property="FocusVisualStyle"
+                Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Controls:NumericUpDown}">
                     <Grid Height="{TemplateBinding Height}"
                           MinHeight="{TemplateBinding MinHeight}"
                           MaxHeight="{TemplateBinding MaxHeight}"
+                          Margin="{TemplateBinding Padding}"
                           VerticalAlignment="{TemplateBinding VerticalAlignment}"
                           Background="{TemplateBinding Background}">
-                        <Rectangle x:Name="Base"
-                                   Stroke="{TemplateBinding BorderBrush}"
-                                   StrokeThickness="{TemplateBinding BorderThickness, Converter={StaticResource ThicknessToDoubleConverter}}"
-                                   Fill="{TemplateBinding Background}" />
-                        <Rectangle x:Name="FocusRectangle"
-                                   Visibility="Collapsed"
-                                   StrokeThickness="{TemplateBinding BorderThickness, Converter={StaticResource ThicknessToDoubleConverter}}" />
+                        <Border x:Name="Base"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{TemplateBinding Background}" />
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="20" />
-                                <ColumnDefinition Width="20" />
+                                <ColumnDefinition x:Name="PART_TextBoxColumn"
+                                                  Width="*" />
+                                <ColumnDefinition x:Name="PART_NumericUpColumn"
+                                                  Width="Auto" />
+                                <ColumnDefinition x:Name="PART_NumericDownColumn"
+                                                  Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <ScrollViewer Grid.Column="0"
-                                          VerticalScrollBarVisibility="Hidden"
-                                          IsTabStop="False">
-                                <TextBox x:Name="PART_TextBox"
-                                         MinWidth="20"
-                                         HorizontalAlignment="Stretch"
-                                         HorizontalContentAlignment="Right"
-                                         VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
-                                         SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
-                                         BorderThickness="0"
-                                         Background="{x:Null}"
-                                         Focusable="True"
-                                         IsReadOnly="{TemplateBinding IsReadOnly}"
-                                         FontFamily="{TemplateBinding FontFamily}"
-                                         FontSize="{TemplateBinding FontSize}"
-                                         Controls:TextboxHelper.ClearTextButton="{TemplateBinding Controls:TextboxHelper.ClearTextButton}"
-                                         Controls:TextboxHelper.Watermark="{TemplateBinding Controls:TextboxHelper.Watermark}" />
-                            </ScrollViewer>
+                            <TextBox x:Name="PART_TextBox"
+                                     Controls:ControlsHelper.DisabledVisualElementVisibility="Collapsed"
+                                     MinWidth="20"
+                                     MinHeight="{TemplateBinding MinHeight}"
+                                     Foreground="{TemplateBinding Foreground}"
+                                     HorizontalAlignment="Stretch"
+                                     HorizontalContentAlignment="Right"
+                                     VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                     SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                     BorderThickness="0"
+                                     Background="{x:Null}"
+                                     Focusable="{TemplateBinding Focusable}"
+                                     HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                     VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}"
+                                     IsReadOnly="{TemplateBinding IsReadOnly}"
+                                     FontFamily="{TemplateBinding FontFamily}"
+                                     FontSize="{TemplateBinding FontSize}"
+                                     Controls:TextBoxHelper.ClearTextButton="{TemplateBinding Controls:TextBoxHelper.ClearTextButton}"
+                                     Controls:TextBoxHelper.Watermark="{TemplateBinding Controls:TextBoxHelper.Watermark}"
+                                     Controls:TextBoxHelper.ButtonsAlignment="{TemplateBinding ButtonsAlignment}" />
                             <RepeatButton x:Name="PART_NumericUp"
                                           Grid.Column="1"
                                           Margin="2,2,0,2"
                                           Delay="{TemplateBinding Delay}"
                                           Foreground="{TemplateBinding Foreground}"
                                           Style="{DynamicResource ChromelessButtonStyle}"
-                                          IsTabStop="False">
+                                          IsTabStop="False"
+                                          Width="{TemplateBinding UpDownButtonsWidth}">
                                 <Path x:Name="PolygonUp"
                                       Width="14"
                                       Height="14"
@@ -97,7 +110,8 @@
                                           Delay="{TemplateBinding Delay}"
                                           Style="{DynamicResource ChromelessButtonStyle}"
                                           Foreground="{TemplateBinding Foreground}"
-                                          IsTabStop="False">
+                                          IsTabStop="False"
+                                          Width="{TemplateBinding UpDownButtonsWidth}">
                                 <Path x:Name="PolygonDown"
                                       Width="14"
                                       Height="3"
@@ -106,12 +120,62 @@
                                       Data="F1 M 19,38L 57,38L 57,44L 19,44L 19,38 Z " />
                             </RepeatButton>
                         </Grid>
+                        <Border x:Name="DisabledVisualElement"
+                                Visibility="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Controls:ControlsHelper.DisabledVisualElementVisibility), Mode=OneWay}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}"
+                                BorderBrush="{DynamicResource ControlsDisabledBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                Background="{DynamicResource ControlsDisabledBrush}"
+                                IsHitTestVisible="False"
+                                Opacity="0" />
                     </Grid>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="ButtonsAlignment"
+                                 Value="Left">
+                            <Setter TargetName="PART_TextBox"
+                                    Property="Grid.Column"
+                                    Value="2" />
+                            <Setter TargetName="PART_NumericDown"
+                                    Property="Grid.Column"
+                                    Value="1" />
+                            <Setter TargetName="PART_NumericDown"
+                                    Property="Margin"
+                                    Value="0,2,2,2" />
+                            <Setter TargetName="PART_NumericUp"
+                                    Property="Margin"
+                                    Value="2,2,0,2" />
+                            <Setter TargetName="PART_NumericUp"
+                                    Property="Grid.Column"
+                                    Value="0" />
+                            <Setter TargetName="PART_NumericDownColumn"
+                                    Property="Width"
+                                    Value="*" />
+                            <Setter TargetName="PART_NumericUpColumn"
+                                    Property="Width"
+                                    Value="Auto" />
+                            <Setter TargetName="PART_TextBoxColumn"
+                                    Property="Width"
+                                    Value="Auto" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled"
+                                 Value="False">
+                            <Setter TargetName="DisabledVisualElement"
+                                    Property="Opacity"
+                                    Value="0.6" />
+                        </Trigger>
                         <Trigger Property="IsReadOnly"
                                  Value="True">
-                            <Setter TargetName="PART_TextBox"
-                                    Property="IsHitTestVisible"
+                            <Setter TargetName="PART_NumericUp"
+                                    Property="IsEnabled"
+                                    Value="False" />
+                            <Setter TargetName="PART_NumericDown"
+                                    Property="IsEnabled"
+                                    Value="False" />
+                            <Setter Property="InterceptArrowKeys"
+                                    Value="False" />
+                            <Setter Property="InterceptMouseWheel"
+                                    Value="False" />
+                            <Setter Property="InterceptManualEnter"
                                     Value="False" />
                         </Trigger>
                         <Trigger Property="IsMouseOver"
@@ -156,22 +220,32 @@
                         </Trigger>
                         <Trigger Property="IsMouseOver"
                                  Value="true">
-                            <Setter TargetName="FocusRectangle"
-                                    Property="Visibility"
-                                    Value="Visible" />
-                            <Setter TargetName="FocusRectangle"
-                                    Property="Stroke"
-                                    Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Controls:TextboxHelper.MouseOverBorderBrush)}" />
+                            <Setter TargetName="Base"
+                                    Property="BorderBrush"
+                                    Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Controls:ControlsHelper.MouseOverBorderBrush)}" />
                         </Trigger>
                         <Trigger Property="IsFocused"
                                  Value="true"
                                  SourceName="PART_TextBox">
-                            <Setter TargetName="FocusRectangle"
+                            <Setter TargetName="Base"
+                                    Property="BorderBrush"
+                                    Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Controls:ControlsHelper.FocusBorderBrush)}" />
+                        </Trigger>
+
+                        <Trigger Property="HideUpDownButtons"
+                                 Value="True">
+                            <Setter TargetName="PART_NumericUp"
                                     Property="Visibility"
-                                    Value="Visible" />
-                            <Setter TargetName="FocusRectangle"
-                                    Property="Stroke"
-                                    Value="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(Controls:TextboxHelper.FocusBorderBrush)}" />
+                                    Value="Collapsed" />
+                            <Setter TargetName="PART_NumericDown"
+                                    Property="Visibility"
+                                    Value="Collapsed" />
+                            <Setter TargetName="PART_NumericUpColumn"
+                                    Property="Width"
+                                    Value="0" />
+                            <Setter TargetName="PART_NumericDownColumn"
+                                    Property="Width"
+                                    Value="0" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

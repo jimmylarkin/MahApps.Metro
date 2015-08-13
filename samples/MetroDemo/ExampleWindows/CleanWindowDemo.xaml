@@ -4,25 +4,27 @@
                       xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
                       xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
                       xmlns:behaviours="clr-namespace:MahApps.Metro.Behaviours;assembly=MahApps.Metro"
+                      xmlns:models="clr-namespace:MetroDemo.Models"
                       Icon="..\mahapps.metro.logo2.ico"
                       ShowIconOnTitleBar="True"
                       GlowBrush="{DynamicResource AccentColorBrush}"
                       Title="CleanWindowDemo"
                       Height="400"
                       Width="800"
+                      ResizeMode="CanResizeWithGrip"
                       Style="{DynamicResource CleanWindowStyleKey}">
 
-    <i:Interaction.Behaviors>
-        <behaviours:BorderlessWindowBehavior ResizeWithGrip="True"
-                                             AllowsTransparency="False" />
-        <behaviours:GlowWindowBehavior />
-    </i:Interaction.Behaviors>
+    <!--    <i:Interaction.Behaviors>-->
+    <!--        <behaviours:BorderlessWindowBehavior ResizeWithGrip="True"-->
+    <!--                                             AllowsTransparency="False" />-->
+    <!--        <behaviours:GlowWindowBehavior />-->
+    <!--    </i:Interaction.Behaviors>-->
 
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceDictionary Source="pack://application:,,,/MahApps.Metro.Resources;component/Icons.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Clean/CleanWindow.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Clean/Clean.xaml"/>
             </ResourceDictionary.MergedDictionaries>
 
             <DataTemplate x:Key="Temp0">
@@ -68,25 +70,25 @@
                     <ScrollViewer Grid.Row="1"
                                   VerticalScrollBarVisibility="Auto">
                         <StackPanel Orientation="Vertical">
-                            <TextBox Controls:TextboxHelper.Watermark="TextBox 01" />
+                            <TextBox Controls:TextBoxHelper.Watermark="TextBox 01" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 02" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 02" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 03" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 03" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 04" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 04" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 05" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 05" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 06" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 06" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 07" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 07" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 08" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 08" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 09" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 09" />
                             <TextBox Margin="0,5,0,0"
-                                     Controls:TextboxHelper.Watermark="TextBox 10" />
+                                     Controls:TextBoxHelper.Watermark="TextBox 10" />
                         </StackPanel>
                     </ScrollViewer>
 
@@ -107,10 +109,51 @@
     </Controls:MetroWindow.Flyouts>
 
     <Grid>
-        <StackPanel>
-            <GroupBox Header="Hello">
-                <StackPanel Orientation="Horizontal"
-                            HorizontalAlignment="Center">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="40" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0">
+            <TextBlock Text="Play, Previous, Next, Volume and Seek bar here." />
+        </Grid>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="300" />
+            </Grid.ColumnDefinitions>
+
+            <GroupBox Grid.Column="0" Header="artists" Padding="5" Controls:ControlsHelper.HeaderFontSize="30">
+                <ListBox ItemsSource="{x:Static models:SampleData.Artists}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding StringFormat="{}{0} - {1}">
+                                        <Binding Path="ArtistId" Mode="OneWay" />
+                                        <Binding Path="Name" Mode="OneWay" />
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </GroupBox>
+
+            <Controls:MetroTabControl x:Name="TC" Grid.Column="1">
+                <Controls:MetroTabItem Header="my music">
+
+                </Controls:MetroTabItem>
+
+                <Controls:MetroTabItem Header="youtube">
+
+                </Controls:MetroTabItem>
+            </Controls:MetroTabControl>
+
+            <GroupBox Grid.Column="2" Header="playlists" Padding="5" Controls:ControlsHelper.HeaderFontSize="30">
+                <StackPanel Orientation="Horizontal">
                     <Button Content="Test"
                             Height="20"
                             Width="40"
@@ -121,21 +164,7 @@
                             Click="Button_Click_1" />
                 </StackPanel>
             </GroupBox>
-            <StackPanel Orientation="Horizontal">
-                <Controls:TransitioningContentControl x:Name="tc"
-                                                      Height="200"
-                                                      Width="200"
-                                                      Content="{Binding ElementName=lb,Path=SelectedItem}">
-
-                </Controls:TransitioningContentControl>
-                <ListBox x:Name="lb"
-                         Width="200"
-                         Height="200">
-                    <ListBoxItem>Item 1</ListBoxItem>
-                    <ListBoxItem>Item 2</ListBoxItem>
-                </ListBox>
-            </StackPanel>
-        </StackPanel>
+        </Grid>
     </Grid>
 
 </Controls:MetroWindow>

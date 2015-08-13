@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -32,12 +29,12 @@ namespace MahApps.Metro.Controls.Dialogs
         internal Task<string> WaitForButtonPressAsync()
         {
             Dispatcher.BeginInvoke(new Action(() =>
-                {
-                    this.Focus();
-                    PART_TextBox.Focus();
-                }));
+            {
+                this.Focus();
+                PART_TextBox.Focus();
+            }));
 
-            TaskCompletionSource<string> tcs = new TaskCompletionSource<string>();
+            var tcs = new TaskCompletionSource<string>();
 
             RoutedEventHandler negativeHandler = null;
             KeyEventHandler negativeKeyHandler = null;
@@ -47,7 +44,15 @@ namespace MahApps.Metro.Controls.Dialogs
 
             KeyEventHandler escapeKeyHandler = null;
 
-            Action cleanUpHandlers = () =>
+            Action cleanUpHandlers = null;
+
+            var cancellationTokenRegistration = DialogSettings.CancellationToken.Register(() =>
+            {
+                cleanUpHandlers();
+                tcs.TrySetResult(null);
+            });
+
+            cleanUpHandlers = () =>
             {
                 PART_TextBox.KeyDown -= affirmativeKeyHandler;
 
@@ -58,9 +63,11 @@ namespace MahApps.Metro.Controls.Dialogs
 
                 PART_NegativeButton.KeyDown -= negativeKeyHandler;
                 PART_AffirmativeButton.KeyDown -= affirmativeKeyHandler;
+
+                cancellationTokenRegistration.Dispose();
             };
 
-            escapeKeyHandler = new KeyEventHandler((sender, e) =>
+            escapeKeyHandler = (sender, e) =>
             {
                 if (e.Key == Key.Escape)
                 {
@@ -68,9 +75,9 @@ namespace MahApps.Metro.Controls.Dialogs
 
                     tcs.TrySetResult(null);
                 }
-            });
+            };
 
-            negativeKeyHandler = new KeyEventHandler((sender, e) =>
+            negativeKeyHandler = (sender, e) =>
             {
                 if (e.Key == Key.Enter)
                 {
@@ -78,9 +85,9 @@ namespace MahApps.Metro.Controls.Dialogs
 
                     tcs.TrySetResult(null);
                 }
-            });
+            };
 
-            affirmativeKeyHandler = new KeyEventHandler((sender, e) =>
+            affirmativeKeyHandler = (sender, e) =>
             {
                 if (e.Key == Key.Enter)
                 {
@@ -88,27 +95,25 @@ namespace MahApps.Metro.Controls.Dialogs
 
                     tcs.TrySetResult(Input);
                 }
-            });
+            };
 
-
-
-            negativeHandler = new RoutedEventHandler((sender, e) =>
+            negativeHandler = (sender, e) =>
             {
                 cleanUpHandlers();
 
                 tcs.TrySetResult(null);
 
                 e.Handled = true;
-            });
+            };
 
-            affirmativeHandler = new RoutedEventHandler((sender, e) =>
+            affirmativeHandler = (sender, e) =>
             {
                 cleanUpHandlers();
 
                 tcs.TrySetResult(Input);
 
                 e.Handled = true;
-            });
+            };
 
             PART_NegativeButton.KeyDown += negativeKeyHandler;
             PART_AffirmativeButton.KeyDown += affirmativeKeyHandler;
@@ -123,7 +128,7 @@ namespace MahApps.Metro.Controls.Dialogs
             return tcs.Task;
         }
 
-        private void Dialog_Loaded(object sender, RoutedEventArgs e)
+        protected override void OnLoaded()
         {
             this.AffirmativeButtonText = this.DialogSettings.AffirmativeButtonText;
             this.NegativeButtonText = this.DialogSettings.NegativeButtonText;
@@ -131,10 +136,9 @@ namespace MahApps.Metro.Controls.Dialogs
             switch (this.DialogSettings.ColorScheme)
             {
                 case MetroDialogColorScheme.Accented:
-                    this.PART_NegativeButton.Style = this.FindResource("HighlightedSquareButtonStyle") as Style;
+                    this.PART_NegativeButton.Style = this.FindResource("AccentedDialogHighlightedSquareButton") as Style;
                     PART_TextBox.SetResourceReference(ForegroundProperty, "BlackColorBrush");
-                    break;
-                default:
+                    PART_TextBox.SetResourceReference(ControlsHelper.FocusBorderBrushProperty, "TextBoxFocusBorderBrush");
                     break;
             }
         }
@@ -149,6 +153,7 @@ namespace MahApps.Metro.Controls.Dialogs
             get { return (string)GetValue(MessageProperty); }
             set { SetValue(MessageProperty, value); }
         }
+
         public string Input
         {
             get { return (string)GetValue(InputProperty); }
@@ -160,6 +165,7 @@ namespace MahApps.Metro.Controls.Dialogs
             get { return (string)GetValue(AffirmativeButtonTextProperty); }
             set { SetValue(AffirmativeButtonTextProperty, value); }
         }
+
         public string NegativeButtonText
         {
             get { return (string)GetValue(NegativeButtonTextProperty); }

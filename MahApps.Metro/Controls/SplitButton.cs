@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -10,23 +9,16 @@ using System.Windows.Media;
 
 namespace MahApps.Metro.Controls
 {
-    /// <summary>
-    ///     <MyNamespace:CustomControl1/>
-    ///
-    /// </summary>
     [ContentProperty("ItemsSource")]
     [DefaultEvent("SelectionChanged"),
     TemplatePart(Name = "PART_Container", Type = typeof(Grid)),
     TemplatePart(Name = "PART_Button", Type = typeof(Button)),
-    TemplatePart(Name = "PART_Image", Type = typeof(Image)),
     TemplatePart(Name = "PART_ButtonContent", Type = typeof(ContentControl)),
     TemplatePart(Name = "PART_Popup", Type = typeof(Popup)),
     TemplatePart(Name = "PART_Expander", Type = typeof(Button)),
     TemplatePart(Name = "PART_ListBox", Type = typeof(ListBox))]
-    public class SplitButton : Control
+    public class SplitButton : ItemsControl
     {
-
-        #region Events
 
         public static readonly RoutedEvent ClickEvent =
             EventManager.RegisterRoutedEvent("Click", RoutingStrategy.Bubble,
@@ -48,130 +40,160 @@ namespace MahApps.Metro.Controls
             remove { RemoveHandler(ClickEvent, value); }
         }
 
-        #endregion
+        public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register("IsExpanded", typeof(bool), typeof(SplitButton));
 
+        public static readonly DependencyProperty SelectedIndexProperty = DependencyProperty.Register("SelectedIndex", typeof(Int32), typeof(SplitButton), new FrameworkPropertyMetadata(-1, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
+        public static readonly DependencyProperty SelectedItemProperty = DependencyProperty.Register("SelectedItem", typeof(Object), typeof(SplitButton), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
-        #region DependencyProperties
+        public static readonly DependencyProperty ExtraTagProperty = DependencyProperty.Register("ExtraTag", typeof(Object), typeof(SplitButton));
 
-        public static readonly DependencyProperty ItemsSourceProperty =
-            DependencyProperty.Register("ItemsSource", typeof(IEnumerable), typeof(SplitButton));
+        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register("Orientation", typeof(Orientation), typeof(SplitButton), new FrameworkPropertyMetadata(Orientation.Horizontal, FrameworkPropertyMetadataOptions.AffectsMeasure));
 
-        public static readonly DependencyProperty ItemTemplateProperty =
-            DependencyProperty.Register("ItemTemplate", typeof(DataTemplate), typeof(SplitButton),
-                new UIPropertyMetadata(null));
+        public static readonly DependencyProperty IconProperty = DependencyProperty.Register("Icon", typeof(Object), typeof(SplitButton));
+        public static readonly DependencyProperty IconTemplateProperty = DependencyProperty.Register("IconTemplate", typeof(DataTemplate), typeof(SplitButton));
 
-        public static readonly DependencyProperty IsExpandedProperty =
-            DependencyProperty.Register("IsExpanded", typeof(bool), typeof(SplitButton));
+        public static readonly DependencyProperty CommandProperty = DependencyProperty.Register("Command", typeof(ICommand), typeof(SplitButton));
+        public static readonly DependencyProperty CommandTargetProperty = DependencyProperty.Register("CommandTarget", typeof(IInputElement), typeof(SplitButton));
+        public static readonly DependencyProperty CommandParameterProperty = DependencyProperty.Register("CommandParameter", typeof(Object), typeof(SplitButton));
 
-        public static readonly DependencyProperty SelectedIndexProperty =
-            DependencyProperty.Register("SelectedIndex", typeof(Int32), typeof(SplitButton), new FrameworkPropertyMetadata(0));
+        public static readonly DependencyProperty ButtonStyleProperty = DependencyProperty.Register("ButtonStyle", typeof(Style), typeof(SplitButton), new FrameworkPropertyMetadata(default(Style), FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public static readonly DependencyProperty ButtonArrowStyleProperty = DependencyProperty.Register("ButtonArrowStyle", typeof(Style), typeof(SplitButton), new FrameworkPropertyMetadata(default(Style), FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public static readonly DependencyProperty ListBoxStyleProperty = DependencyProperty.Register("ListBoxStyle", typeof(Style), typeof(SplitButton), new FrameworkPropertyMetadata(default(Style), FrameworkPropertyMetadataOptions.Inherits | FrameworkPropertyMetadataOptions.AffectsArrange | FrameworkPropertyMetadataOptions.AffectsMeasure));
+        public static readonly DependencyProperty ArrowBrushProperty = DependencyProperty.Register("ArrowBrush", typeof(Brush), typeof(SplitButton), new FrameworkPropertyMetadata(default(Brush), FrameworkPropertyMetadataOptions.AffectsRender));
 
-        public static readonly DependencyProperty SelectedItemProperty =
-            DependencyProperty.Register("SelectedItem", typeof(Object), typeof(SplitButton));
-
-        public static readonly DependencyProperty ExtraTagProperty =
-            DependencyProperty.Register("ExtraTag", typeof(Object), typeof(SplitButton));
-
-        public static readonly DependencyProperty OrientationProperty =
-            DependencyProperty.Register("Orientation", typeof(Orientation), typeof(SplitButton),
-                new FrameworkPropertyMetadata(Orientation.Horizontal));
-
-        public static readonly DependencyProperty IconProperty =
-            DependencyProperty.Register("Icon", typeof(ImageSource), typeof(SplitButton));
-
-        public static readonly DependencyProperty CommandProperty =
-            DependencyProperty.Register("Command", typeof(ICommand), typeof(SplitButton));
-
-        public static readonly DependencyProperty CommandTargetProperty =
-            DependencyProperty.Register("CommandTarget", typeof(IInputElement), typeof(SplitButton));
-
-        public static readonly DependencyProperty CommandParameterProperty =
-            DependencyProperty.Register("CommandParameter", typeof(Object), typeof(SplitButton));
-
-
+        /// <summary>
+        /// Reflects the parameter to pass to the CommandProperty upon execution. 
+        /// </summary>
         public Object CommandParameter
         {
             get { return (Object)GetValue(CommandParameterProperty); }
             set { SetValue(CommandParameterProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets the target element on which to fire the command.
+        /// </summary>
         public IInputElement CommandTarget
         {
             get { return (IInputElement)GetValue(CommandTargetProperty); }
             set { SetValue(CommandTargetProperty, value); }
         }
 
+        /// <summary>
+        /// Get or sets the Command property. 
+        /// </summary>
         public ICommand Command
         {
             get { return (ICommand)GetValue(CommandProperty); }
             set { SetValue(CommandProperty, value); }
         }
 
-        public IEnumerable ItemsSource
-        {
-            get { return (IEnumerable)GetValue(ItemsSourceProperty); }
-            set { SetValue(ItemsSourceProperty, value); }
-        }
-
-        public DataTemplate ItemTemplate
-        {
-            get { return (DataTemplate)GetValue(ItemTemplateProperty); }
-            set { SetValue(ItemTemplateProperty, value); }
-        }
-
+        /// <summary> 
+        ///  The index of the first item in the current selection or -1 if the selection is empty. 
+        /// </summary>
         public Int32 SelectedIndex
         {
             get { return (Int32)GetValue(SelectedIndexProperty); }
             set { SetValue(SelectedIndexProperty, value); }
         }
 
+        /// <summary>
+        ///  The first item in the current selection, or null if the selection is empty. 
+        /// </summary>
         public Object SelectedItem
         {
             get { return GetValue(SelectedItemProperty); }
             set { SetValue(SelectedItemProperty, value); }
         }
 
+        /// <summary> 
+        /// Indicates whether the Popup is visible. 
+        /// </summary>
         public Boolean IsExpanded
         {
             get { return (bool)GetValue(IsExpandedProperty); }
             set { SetValue(IsExpandedProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets an extra tag.
+        /// </summary>
         public Object ExtraTag
         {
             get { return GetValue(ExtraTagProperty); }
             set { SetValue(ExtraTagProperty, value); }
         }
 
+        /// <summary>
+        /// Gets or sets the dimension of children stacking.
+        /// </summary>
         public Orientation Orientation
         {
             get { return (Orientation)GetValue(OrientationProperty); }
             set { SetValue(OrientationProperty, value); }
         }
 
-        public ImageSource Icon
+        /// <summary>
+        ///  Gets or sets the Content used to generate the icon part.
+        /// </summary>
+        [Bindable(true)]
+        public Object Icon
         {
-            get { return (ImageSource)GetValue(IconProperty); }
+            get { return GetValue(IconProperty); }
             set { SetValue(IconProperty, value); }
         }
 
-        #endregion
+        /// <summary> 
+        /// Gets or sets the ContentTemplate used to display the content of the icon part. 
+        /// </summary>
+        [Bindable(true)]
+        public DataTemplate IconTemplate
+        {
+            get { return (DataTemplate)GetValue(IconTemplateProperty); }
+            set { SetValue(IconTemplateProperty, value); }
+        }
 
+        /// <summary>
+        /// Gets/sets the button style.
+        /// </summary>
+        public Style ButtonStyle
+        {
+            get { return (Style)GetValue(ButtonStyleProperty); }
+            set { SetValue(ButtonStyleProperty, value); }
+        }
 
-        #region Variables
+        /// <summary>
+        /// Gets/sets the button arrow style.
+        /// </summary>
+        public Style ButtonArrowStyle
+        {
+            get { return (Style)GetValue(ButtonArrowStyleProperty); }
+            set { SetValue(ButtonArrowStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets/sets the popup listbox style.
+        /// </summary>
+        public Style ListBoxStyle
+        {
+            get { return (Style)GetValue(ListBoxStyleProperty); }
+            set { SetValue(ListBoxStyleProperty, value); }
+        }
+
+        /// <summary>
+        /// Gets/sets the brush of the button arrow icon.
+        /// </summary>
+        public Brush ArrowBrush
+        {
+            get { return (Brush)GetValue(ArrowBrushProperty); }
+            set { SetValue(ArrowBrushProperty, value); }
+        }
 
         private Button _clickButton;
         private Button _expander;
         private ListBox _listBox;
-        private bool _mouseLeaved;
+        private Popup _popup;
 
-
-        #endregion
-
-
-        public SplitButton()
-        {
-        }
         static SplitButton()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(SplitButton), new FrameworkPropertyMetadata(typeof(SplitButton)));
@@ -196,21 +218,13 @@ namespace MahApps.Metro.Controls
             IsExpanded = !IsExpanded;
         }
 
-        void SplitButton_LostMouseCapture(object sender, System.Windows.Input.MouseEventArgs e)
-        {
-            if (_mouseLeaved)
-            {
-                IsExpanded = false;
-                _mouseLeaved = false;
-            }
-        }
-
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
             _clickButton = EnforceInstance<Button>("PART_Button");
             _expander = EnforceInstance<Button>("PART_Expander");
             _listBox = EnforceInstance<ListBox>("PART_ListBox");
+            _popup = EnforceInstance<Popup>("PART_Popup");
             InitializeVisualElementsContainer();
         }
 
@@ -223,19 +237,54 @@ namespace MahApps.Metro.Controls
 
         private void InitializeVisualElementsContainer()
         {
+            _expander.Click -= ExpanderClick;
+            _clickButton.Click -= ButtonClick;
+            _listBox.SelectionChanged -= ListBoxSelectionChanged;
+            _listBox.PreviewMouseLeftButtonDown -= ListBoxPreviewMouseLeftButtonDown;
+            _popup.Opened -= PopupOpened;
+            _popup.Closed -= PopupClosed;
+
             _expander.Click += ExpanderClick;
             _clickButton.Click += ButtonClick;
             _listBox.SelectionChanged += ListBoxSelectionChanged;
-            LostMouseCapture += SplitButton_LostMouseCapture;
-            MouseLeave += SplitButton_MouseLeave;
-            
+            _listBox.PreviewMouseLeftButtonDown += ListBoxPreviewMouseLeftButtonDown;
+            _popup.Opened += PopupOpened;
+            _popup.Closed += PopupClosed;
         }
 
-        void SplitButton_MouseLeave(object sender, MouseEventArgs e)
+        //Make popup close even if no selectionchanged event fired (case when user select the save item as before)
+        void ListBoxPreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _mouseLeaved = true; 
+            var source = e.OriginalSource as DependencyObject;
+            if (source != null)
+            {
+                var item = ContainerFromElement(this._listBox, source) as ListBoxItem;
+                if (item != null)
+                {
+                    this.IsExpanded = false;
+                }
+            }
         }
 
-    }
+        void PopupClosed(object sender, EventArgs e)
+        {
+            this.ReleaseMouseCapture();
+            if (this._expander != null)
+            {
+                this._expander.Focus();
+            }
+        }
 
+        void PopupOpened(object sender, EventArgs e)
+        {
+            Mouse.Capture(this, CaptureMode.SubTree);
+            Mouse.AddPreviewMouseDownOutsideCapturedElementHandler(this, OutsideCapturedElementHandler);
+        }
+
+        private void OutsideCapturedElementHandler(object sender, MouseButtonEventArgs mouseButtonEventArgs)
+        {
+            IsExpanded = false;
+            Mouse.RemovePreviewMouseDownOutsideCapturedElementHandler(this, OutsideCapturedElementHandler);
+        }
+    }
 }
