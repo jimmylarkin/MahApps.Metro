@@ -5,15 +5,6 @@ using System.Windows.Input;
 
 namespace MahApps.Metro.Controls.Dialogs
 {
-    /// <summary>
-    /// Interface to specify type returned by the custom input dialogs
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    public interface InputDialog<T>
-    {
-        Task<T> WaitForButtonPressAsync();
-    }
-    
     public partial class InputDialog : BaseMetroDialog
     {
         internal InputDialog(MetroWindow parentWindow)
